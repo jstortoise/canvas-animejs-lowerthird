@@ -1,0 +1,39 @@
+{
+	"caption": "Lower Third 1",
+	"delay": 1000,
+	"duration": 3000,
+	"options": [
+		[{
+			"name": "text1",
+			"caption": "Text 1",
+			"type": "text",
+			"value": "MDLABDESIGN"
+		}, {
+			"name": "text1_color",
+			"caption": "Text 1 color",
+			"type": "color",
+			"value": "#fffefe"
+		}, {
+			"name": "text1_bgcolor",
+			"caption": "Text 1 background color",
+			"type": "color",
+			"value": "#669de7"
+		}],
+		[{
+			"name": "text2",
+			"caption": "Text 2",
+			"type": "text",
+			"value": "MOTION GRAPHIC STUDIO"
+		}, {
+			"name": "text2_color",
+			"caption": "Text 2 color",
+			"type": "color",
+			"value": "#669de7"
+		}, {
+			"name": "text2_bgcolor",
+			"caption": "Text 2 background color",
+			"type": "color",
+			"value": "#fffefe"
+		}]
+	]
+}

@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<link rel="stylesheet" href="../../../fonts/font.css">
+	<link rel="stylesheet" href="css/style.css"/>
+	<script src="../../../lib/anime.min.js"></script>
+</head>
+<body>
+	<div class="vba-area">
+		<canvas class="lower-third"></canvas>
+	</div>
+
+	<!-- BUTTONS -->
+	<div id="vba-buttons" style="display: none; position: fixed; right: 20px; top: 20px;">
+		<button type="button" id="playpause" class="vba-btn">
+			Play / Pause
+		</button>
+		<button type="button" id="play" class="vba-btn">
+			Play
+		</button>
+		<button type="button" id="pause" class="vba-btn">
+			Pause
+		</button>
+		<button type="button" id="stop" class="vba-btn">
+			Stop
+		</button>
+		<button type="button" id="restart" class="vba-btn">
+			Replay
+		</button>
+	</div>
+</body>
+<script>
+	//var timeline = anime.timeline();
+	var timeline = anime.timeline({
+		loop: false,
+		direction: 'alternate',
+		autoplay: true
+	});
+
+	var canvasEl = document.querySelector('.lower-third');
+	var ctx = canvasEl.getContext('2d');
+
+	function setCanvasSize() {
+		var rectObject = canvasEl.parentNode.getBoundingClientRect();
+		canvasEl.width = rectObject.width;
+		canvasEl.height = rectObject.height;
+		canvasEl.style.width = rectObject.width + 'px';
+		canvasEl.style.height = rectObject.height + 'px';
+	}
+
+	setCanvasSize();
+
+	var orgX = 100,		//clip X position
+		orgY = 500,		//clip Y position
+		orgWidth = 500,	//clip Width
+		orgHeight = 200;//clip Height
+
+	var settings = {
+		circle: {
+			x: orgX,
+			y: orgY + 100,
+			radius: 3,
+			color: '#fff'
+		},
+		line: {
+			//start point
+			sx: orgX,
+			sy: orgY + 100,
+			//destinate point
+			dx: orgX + orgWidth,
+			dy: orgY + 100,
+			color: '#fff'
+		},
+		rect: [{
+			//text1 background
+			x: orgX + 50,
+			y: orgY + 40,
+			width: orgWidth - 50,
+			height: 57,
+			color: '#fab827',
+			direction: 1	//from bottom to top
+		}, {
+			// text 2 background
+			x: orgX + 170,
+			y: orgY + 103,
+			width: orgWidth - 170,
+			height: 27,
+			color: '#2abee4',
+			direction: -1	//from top to bottom
+		}],
+		text: [{
+			//text1
+			text: 'DOOMO DESIGNS',
+			font: '45px Arial',
+			align: 'center',
+			color: '#fff',
+			x: (orgX * 2 + 50 + orgWidth) / 2,
+			y: (orgY + 85),
+			height: 57,
+			direction: 1	//from bottom to top
+		}, {
+			//text2
+			text: 'MOTION GRAPHIC STUDIO',
+			font: '20px Arial',
+			align: 'center',
+			color: '#fff',
+			x: (orgX * 2 + 170 + orgWidth) / 2,
+			y: (orgY + 123),
+			height: 27,
+			direction: -1	//from top to bottom
+		}]
+	}
+
+	function createCircle(opt) {
+		var p = {};
+		p.offsetY = 300;
+
+		p.draw = function() {
+			ctx.save();
+			//clip range
+			ctx.beginPath();
+			ctx.rect(orgX - 10, orgY - 210, 20, 500);
+			ctx.clip();
+
+			ctx.beginPath();
+			var y = orgY + p.offsetY * 1;
+			ctx.arc(opt.x, y, opt.radius, 0, Math.PI * 2);
+			ctx.fillStyle = opt.color;
+			ctx.fill();
+			ctx.closePath();
+
+			ctx.restore();
+		}
+		return p;
+	}
+
+	function createLine(opt) {
+		var p = {};
+		p.offsetX = 0;
+		p.draw = function() {
+			//clip range
+			ctx.save();
+			ctx.beginPath();
+			ctx.rect(orgX, orgY, orgWidth, orgHeight);
+			ctx.clip();
+
+			ctx.beginPath();
+			ctx.moveTo(opt.sx, opt.sy);
+			ctx.lineTo(opt.sx + p.offsetX * 1, opt.dy);
+			ctx.strokeStyle = opt.color;
+			ctx.stroke();
+			ctx.closePath();
+
+			ctx.restore();
+		}
+		return p;
+	}
+
+	function createRect(opt) {
+		var p = {};
+		p.offsetY = opt.height * opt.direction;
+		p.draw = function() {
+			//clip range
+			ctx.save();
+			ctx.beginPath();
+			if (opt.direction > 0) {
+				ctx.rect(orgX, orgY, orgWidth, orgHeight / 2 - 3);
+			} else {
+				ctx.rect(orgX, orgY + orgHeight / 2 + 3, orgWidth, orgHeight / 2);
+			}
+			ctx.clip();
+
+			ctx.beginPath();
+			ctx.fillStyle = opt.color;
+			ctx.fillRect(opt.x, opt.y + p.offsetY * 1, opt.width, opt.height);
+
+			ctx.restore();
+		}
+		return p;
+	}
+
+	function createText(opt) {
+		var p = {};
+		p.offsetY = opt.height * opt.direction;
+		p.draw = function() {
+			//clip range
+			ctx.save();
+			ctx.beginPath();
+			if (opt.direction > 0) {
+				ctx.rect(orgX, orgY, orgWidth, orgHeight / 2 - 3);
+			} else {
+				ctx.rect(orgX, orgY + orgHeight / 2 + 3, orgWidth, orgHeight / 2);
+			}
+			ctx.clip();
+
+			// draw text
+			ctx.font = opt.font;
+			ctx.fillStyle = opt.color;
+			ctx.textAlign = opt.align;
+			ctx.fillText(opt.text, opt.x, opt.y + p.offsetY * 1);
+
+			ctx.restore();
+		}
+		return p;
+	}
+
+	var circle = createCircle(settings.circle);
+	var line = createLine(settings.line);
+
+	var rect1 = createRect(settings.rect[0]);
+	var rect2 = createRect(settings.rect[1]);
+
+	var text1 = createText(settings.text[0]);
+	var text2 = createText(settings.text[1]);
+
+	var clearCanvas = function(){
+		ctx.clearRect(0, 0, canvasEl.width, canvasEl.height);
+	};
+
+	function drawTargets(anim) {
+		clearCanvas();
+		for (var i = 0; i < anim.animatables.length; i++) {
+			anim.animatables[i].target.draw();
+		}
+	}
+
+	var easing = [
+		'easeInExpo',
+		'easeOutQuad',
+		'easeOutQuint',
+		'easeOutQuint',
+		'easeOutQuint',
+		'easeOutQuint'
+	];
+	var duration = [500, 1000, 2000, 2000, 2000, 2000];
+	var delay = [0, 500, 1500, 1500, 2000, 2000];
+	var offsetY = [100, 0, 0, 0, 0, 0];
+
+	var delay1 = [4000, 3000, 1000, 1000, 500, 500];
+	var easing1 = [
+		'easeInOutCirc',
+		'easeInQuad',
+		'easeInQuint',
+		'easeInQuint',
+		'easeInQuint',
+		'easeInQuint'
+	];
+	var offsetY1 = [300, 0, 57, -27, 57, -27];
+
+	timeline.add({
+		targets: circle,
+		offsetY: -200,
+		easing: 'easeOutExpo',
+		delay: 0,
+		duration: 1000,
+		update: drawTargets
+	}).add({
+		targets: [circle, line, rect1, rect2, text1, text2],
+		offsetY: function(el, i) { return offsetY[i]; },
+		offsetX: orgWidth,
+		easing: function(el, i) { return easing[i]; },
+		delay: function(el, i) { return delay[i]; },
+		duration: function(el, i) { return duration[i]; },
+		update: drawTargets
+	}).add({
+		targets: [circle, line, rect1, rect2, text1, text2],
+		offsetY: function(el, i) { return offsetY1[i]; },
+		offsetX: 0,
+		easing: function(el, i) { return easing1[i]; },
+		delay: function(el, i) { return delay1[i]; },
+		duration: function(el, i) { return duration[i]; },
+		update: drawTargets
+	}).complete = clearCanvas;
+
+
+	document.getElementById("playpause").onclick = function() {
+		if( timeline.paused ){
+			timeline.play();
+		} else {
+			timeline.pause();
+		}
+	};
+
+	document.getElementById("play").onclick = function() {
+		timeline.play();
+	};
+
+	document.getElementById("pause").onclick = function() {
+		timeline.pause();
+	};
+
+	document.getElementById("stop").onclick = function() {
+		clearTimeout();
+		timeline.restart();
+		timeline.pause();
+		clearCanvas();
+	};
+
+	document.getElementById("restart").onclick = function() {
+		timeline.restart();
+	};
+
+    //To display buttons add #buttons hash to page address and reload
+    if( window.location.hash.indexOf('buttons') > -1 ){
+        document.getElementById('vba-buttons').style.display = 'block';
+    }
+</script>
+</html>

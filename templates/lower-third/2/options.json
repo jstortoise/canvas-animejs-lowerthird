@@ -1,0 +1,39 @@
+{
+	"caption": "Lower Third 2",
+	"delay": 1000,
+	"duration": 2500,
+	"options": [
+		[{
+			"name": "text1",
+			"caption": "Text",
+			"type": "text",
+			"value": "NO PLUGIN REQUIRED",
+		}, {
+			"name": "text1_color",
+			"caption": "Text 1 color",
+			"type": "color",
+			"value": "#fefffe"
+		}, {
+			"name": "text1_line_color",
+			"caption": "Text 1 line color",
+			"type": "color",
+			"value": "#7dc6c1"
+		}],
+		[{
+			"name": "text2",
+			"caption": "Text",
+			"type": "text",
+			"value": "GREAT TITLEPACK",
+		}, {
+			"name": "text2_color",
+			"caption": "Text 2 color",
+			"type": "color",
+			"value": "#fefffe"
+		}, {
+			"name": "text2_line_color",
+			"caption": "Text 2 line color",
+			"type": "color",
+			"value": "#faaa19"
+		}]
+	]
+}

@@ -1,0 +1,60 @@
+{
+	"caption": "Lower Third 4",
+	"delay": 1000,
+	"duration": 3000,
+	"options": [
+		[{
+			"name": "text1",
+			"caption": "Text 1",
+			"type": "text",
+			"value": "RICKEY"
+		}, {
+			"name": "text1_color",
+			"caption": "Text 1 color",
+			"type": "color",
+			"value": "#999"
+		}],
+		[{
+			"name": "text2",
+			"caption": "Text 2",
+			"type": "text",
+			"value": "WASHINGTON"
+		}, {
+			"name": "text2_color_1",
+			"caption": "Text 2 color 1",
+			"type": "color",
+			"value": "#d63f05"
+		}, {
+			"name": "text2_bgcolor_1",
+			"caption": "Text 2 background color 1",
+			"type": "color",
+			"value": "#fff"
+		}, {
+			"name": "text2_color_2",
+			"caption": "Text 2 color 2",
+			"type": "color",
+			"value": "#fff"
+		}, {
+			"name": "text2_bgcolor_2",
+			"caption": "Text 2 background color 2",
+			"type": "color",
+			"value": "#d63f05"
+		}],
+		[{
+			"name": "text3",
+			"caption": "Text 3",
+			"type": "text",
+			"value": "MOTION GRAPHIC DESIGNER"
+		}, {
+			"name": "text3_color",
+			"caption": "Text 3 color",
+			"type": "color",
+			"value": "#333"
+		}, {
+			"name": "text3_bgcolor",
+			"caption": "Text 3 background color",
+			"type": "color",
+			"value": "#fff"
+		}]
+	]
+}

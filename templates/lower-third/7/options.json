@@ -1,0 +1,40 @@
+{
+	"caption": "Lower Third 6",
+	"delay": 1000,
+	"duration": 2000,
+	"options": [
+		[{
+			"name": "text1",
+			"caption": "Text 1",
+			"type": "text",
+			"value": "SMOOTH ANIMATION"
+		}, {
+			"name": "text1_color",
+			"caption": "Text 1 color",
+			"type": "color",
+			"value": "#fff"
+		}],
+		[{
+			"name": "text2",
+			"caption": "Text 2",
+			"type": "text",
+			"value": "VIDEO TUTORIAL INCLUDED"
+		}, {
+			"name": "text2_color",
+			"caption": "Text 2 color",
+			"type": "color",
+			"value": "#fff"
+		}],
+		[{
+			"name": "circle_color_1",
+			"caption": "circle color 1",
+			"type": "color",
+			"value": "#85aeba"
+		}, {
+			"name": "circle_color_2",
+			"caption": "circle color 2",
+			"type": "color",
+			"value": "#ffae21"
+		}]
+	]
+}

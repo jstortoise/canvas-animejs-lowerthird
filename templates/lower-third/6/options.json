@@ -1,0 +1,40 @@
+{
+	"caption": "Lower Third 6",
+	"delay": 1000,
+	"duration": 8000,
+	"options": [
+		[{
+			"name": "text1",
+			"caption": "Text 1",
+			"type": "text",
+			"value": "FREE FONT INCLUDED"
+		}, {
+			"name": "text1_color_1",
+			"caption": "Text 1 color 1",
+			"type": "color",
+			"value": "#fff"
+		}, {
+			"name": "text1_color_2",
+			"caption": "Text 1 color 2",
+			"type": "color",
+			"value": "#83c5c0"
+		}],
+		[{
+			"name": "text2",
+			"caption": "Text 2",
+			"type": "text",
+			"value": "LOWER THIRD PACK"
+		}, {
+			"name": "text2_color",
+			"caption": "Text 2 color",
+			"type": "color",
+			"value": "#ccc"
+		}],
+		[{
+			"name": "line_color",
+			"caption": "line color",
+			"type": "color",
+			"value": "#ffae21"
+		}]
+	]
+}

@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<link rel="stylesheet" href="../../../fonts/font.css">
+	<link rel="stylesheet" href="css/style.css"/>
+	<script src="../../../lib/anime.min.js"></script>
+</head>
+<body>
+	<div class="vba-area">
+		<canvas class="lower-third"></canvas>
+	</div>
+
+	<!-- BUTTONS -->
+	<div id="vba-buttons" style="display: none; position: fixed; right: 20px; top: 20px;">
+		<button type="button" id="playpause" class="vba-btn">
+			Play / Pause
+		</button>
+		<button type="button" id="play" class="vba-btn">
+			Play
+		</button>
+		<button type="button" id="pause" class="vba-btn">
+			Pause
+		</button>
+		<button type="button" id="stop" class="vba-btn">
+			Stop
+		</button>
+		<button type="button" id="restart" class="vba-btn">
+			Replay
+		</button>
+	</div>
+</body>
+<script>
+	//var timeline = anime.timeline();
+	var timeline = anime.timeline({
+		loop: false,
+		direction: 'alternate',
+		autoplay: true
+	});
+
+	var canvasEl = document.querySelector('.lower-third');
+	var ctx = canvasEl.getContext('2d');
+
+	function setCanvasSize() {
+		var rectObject = canvasEl.parentNode.getBoundingClientRect();
+		canvasEl.width = rectObject.width;
+		canvasEl.height = rectObject.height;
+		canvasEl.style.width = rectObject.width + 'px';
+		canvasEl.style.height = rectObject.height + 'px';
+	}
+
+	setCanvasSize();
+
+	var orgX = 300,		//clip X position
+		orgY = 500,		//clip Y position
+		orgWidth = 500,	//clip Width
+		orgHeight = 150;//clip Height
+
+	var settings = {
+		delay: 500,		//options.json.delay
+		duration: 8000,	//options.json.duration
+		line: [{
+			//start point
+			sx: orgX,
+			sy: orgY + 10,
+			//destinate point
+			dx: orgX,
+			dy: orgY + orgHeight,
+			width: 10,
+			length: orgHeight - 20,
+			color: '#ffae21'
+		}],
+		text: [{
+			//text1-1
+			text: 'FREE FONT INCLUDED',
+			font: 'bold 40px Arial',
+			align: 'left',
+			color: '#fff',
+			x: orgX + 40,
+			y: orgY + 50,
+			height: 45,
+			direction: 1	//from left to right
+		}, {
+			//text1-2
+			text: 'FREE FONT INCLUDED',
+			font: 'bold 40px Arial',
+			align: 'left',
+			color: '#83c5c0',
+			x: orgX + 40,
+			y: orgY + 50,
+			height: 45,
+			direction: -1	//from right to left
+		}, {
+			//text2
+			text: 'LOWER THIRD PACK',
+			font: '32px Arial',
+			align: 'left',
+			color: '#ccc',
+			x: orgX - 140,
+			y: orgY + 100,
+			height: 35,
+			direction: -1	//from right to left
+		}]
+	}
+
+	function getDiffY(length, diffX) {
+		return Math.sqrt(length * length - diffX * diffX);
+	}
+
+	function createLine(opt) {
+		var p = {};
+		p.offsetX = -300;
+		p.offsetY = 0;
+		p.draw = function() {
+			p.offsetX *= 1;
+			//clip range
+			ctx.save();
+			ctx.beginPath();
+			ctx.rect(orgX - 300, orgY, orgWidth + 320, orgHeight);
+			ctx.clip();
+
+			ctx.beginPath();
+			ctx.lineWidth = opt.width;
+			ctx.strokeStyle = opt.color;
+			var sy = 0, dy = getDiffY(opt.length, 0), sx = 0, dx = 0;
+			if (p.offsetX < 0) {
+				sx = p.offsetX / 5;
+				dx = -p.offsetX / 5;
+				sy = p.offsetX / 300 * opt.length / 2;
+				dy = Math.round(getDiffY(opt.length + sy * 2, (dx - sx)));
+			}
+
+			ctx.moveTo(opt.sx + p.offsetX + sx, opt.sy - sy);
+
+			ctx.lineTo(opt.sx + p.offsetX + dx, opt.sy + dy);
+			
+			ctx.stroke();
+			ctx.closePath();
+
+			ctx.restore();
+		}
+		return p;
+	}
+
+	function createText(opt) {
+		var p = {};
+		if (opt.direction > 0) {
+			p.offsetX = 0;
+		} else {
+			p.offsetX = orgWidth;
+		}
+		p.x = 0;
+		p.draw = function() {
+			var space = 0;
+			if (opt.direction > 0) {
+				if (p.offsetX < orgWidth / 2) {
+					space = p.offsetX;
+				} else {
+					space = orgWidth - p.offsetX;
+				}
+			}
+			space /= 30;
+			canvasEl.style.letterSpacing = space + "px";
+
+			//clip range
+			ctx.save();
+			ctx.beginPath();
+			if (opt.direction > 0) {
+				ctx.rect(orgX, orgY, p.offsetX, orgHeight);
+				ctx.strokeStyle = "#fff";
+			} else {
+				ctx.rect(orgX + p.offsetX * 1, orgY, orgWidth - p.offsetX, orgHeight);
+				ctx.strokeStyle = "#fff";
+			}
+			ctx.clip();
+
+			// draw text
+			ctx.font = opt.font;
+			ctx.fillStyle = opt.color;
+			ctx.textAlign = opt.align;
+			ctx.fillText(opt.text, opt.x - p.x * opt.direction, opt.y);
+
+			ctx.restore();
+		}
+		return p;
+	}
+
+	var line = createLine(settings.line[0]);
+
+	var text1 = createText(settings.text[0]);
+	var text2 = createText(settings.text[1]);
+	var text3 = createText(settings.text[2]);
+	line.draw();
+
+	var clearCanvas = function(){
+		ctx.clearRect(0, 0, canvasEl.width, canvasEl.height);
+	};
+
+	function drawTargets(anim) {
+		clearCanvas();
+		for (var i = 0; i < anim.animatables.length; i++) {
+			anim.animatables[i].target.draw();
+		}
+	}
+
+	var x = [0, -20, -20, 160];
+	var x1 = [0, 20, -50, -200];
+	var offsetX = [0, 0, orgWidth, orgWidth];
+	var offsetX1 = [-300, 0, orgWidth, orgWidth];
+	timeline.add({
+		targets: line,
+		offsetX: 0,
+		easing: 'easeInCubic',
+		delay: 0,
+		duration: settings.duration / 8,
+		update: drawTargets
+	}).add({
+		targets: [line, text1],
+		offsetX: orgWidth,
+		x: 20,
+		easing: 'easeOutCubic',
+		delay: 0,
+		duration: settings.duration / 8,
+		update: drawTargets
+	}).add({
+		targets: [line, text1, text2, text3],
+		offsetX: 0,
+		x: function(el, i) { return x[i]; },
+		easing: 'easeInOutCubic',
+		delay: 0,
+		duration: settings.duration / 4,
+		update: drawTargets
+	}).add({
+		targets: [line, text1, text2, text3],
+		offsetX: orgWidth,
+		x: function(el, i) { return x1[i]; },
+		easing: 'easeInOutCubic',
+		delay: settings.delay,
+		duration: settings.duration / 4,
+		update: drawTargets
+	}).add({
+		targets: [line, text1, text2, text3],
+		offsetX: function(el, i) { return offsetX[i]; },
+		x: -20,
+		easing: 'easeInCubic',
+		delay: 0,
+		duration: settings.duration / 8,
+		update: drawTargets
+	}).add({
+		targets: [line, text1, text2, text3],
+		offsetX: function(el, i) { return offsetX1[i]; },
+		x: 0,
+		easing: 'easeOutCubic',
+		delay: 0,
+		duration: settings.duration / 8,
+		update: drawTargets
+	});//.complete = clearCanvas;
+
+	document.getElementById("playpause").onclick = function() {
+		if( timeline.paused ){
+			timeline.play();
+		} else {
+			timeline.pause();
+		}
+	};
+
+	document.getElementById("play").onclick = function() {
+		timeline.play();
+	};
+
+	document.getElementById("pause").onclick = function() {
+		timeline.pause();
+	};
+
+	document.getElementById("stop").onclick = function() {
+		clearTimeout();
+		timeline.restart();
+		timeline.pause();
+		clearCanvas();
+	};
+
+	document.getElementById("restart").onclick = function() {
+		timeline.restart();
+	};
+
+    //To display buttons add #buttons hash to page address and reload
+    if( window.location.hash.indexOf('buttons') > -1 ){
+        document.getElementById('vba-buttons').style.display = 'block';
+    }
+</script>
+</html>

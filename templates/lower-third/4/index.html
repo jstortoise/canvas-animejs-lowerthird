@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<link rel="stylesheet" href="../../../fonts/font.css">
+	<link rel="stylesheet" href="css/style.css"/>
+	<script src="../../../lib/anime.min.js"></script>
+</head>
+<body>
+	<div class="vba-area">
+		<canvas class="lower-third"></canvas>
+	</div>
+
+	<!-- BUTTONS -->
+	<div id="vba-buttons" style="display: none; position: fixed; right: 20px; top: 20px;">
+		<button type="button" id="playpause" class="vba-btn">
+			Play / Pause
+		</button>
+		<button type="button" id="play" class="vba-btn">
+			Play
+		</button>
+		<button type="button" id="pause" class="vba-btn">
+			Pause
+		</button>
+		<button type="button" id="stop" class="vba-btn">
+			Stop
+		</button>
+		<button type="button" id="restart" class="vba-btn">
+			Replay
+		</button>
+	</div>
+</body>
+<script>
+	//var timeline = anime.timeline();
+	var timeline = anime.timeline({
+		loop: 2,
+		direction: 'alternate',
+		autoplay: true
+	});
+
+	var canvasEl = document.querySelector('.lower-third');
+	var ctx = canvasEl.getContext('2d');
+
+	function setCanvasSize() {
+		var rectObject = canvasEl.parentNode.getBoundingClientRect();
+		canvasEl.width = rectObject.width;
+		canvasEl.height = rectObject.height;
+		canvasEl.style.width = rectObject.width + 'px';
+		canvasEl.style.height = rectObject.height + 'px';
+	}
+
+	setCanvasSize();
+
+	var orgX = 100,		//clip X position
+		orgY = 500,		//clip Y position
+		orgWidth = 350,	//clip Width
+		orgHeight = 200;//clip Height
+
+	var settings = {
+		text: [{
+			//text1
+			text: 'RICKEY',
+			font: '45px Arial',
+			align: 'left',
+			color: '#999',
+			x: orgX + 20,
+			y: orgY + 50,
+		}, {
+			//text2
+			text: 'WASHINGTON',
+			font: '45px Arial',
+			align: 'center',
+			color: '#d63f05',
+			x: (orgX * 2 + orgWidth) / 2,
+			y: (orgY + 115),
+			//text1 background
+			bX: orgX,
+			bY: orgY + 70,
+			width: orgWidth,
+			height: 60,
+			backColor: '#fff',
+			direction: 1
+		}, {
+			//text2 after
+			text: 'WASHINGTON',
+			font: '45px Arial',
+			align: 'center',
+			color: '#fff',
+			x: (orgX * 2 + orgWidth) / 2,
+			y: (orgY + 115),
+			//text1 background
+			bX: orgX,
+			bY: orgY + 70,
+			width: orgWidth,
+			height: 60,
+			backColor: '#d63f05',
+			direction: 1
+		}, {
+			//text3
+			text: 'MOTION GRAPHIC DESIGNER',
+			font: '22px Arial',
+			align: 'center',
+			color: '#333',
+			x: (orgX * 2 + orgWidth) / 2,
+			y: (orgY + 152),
+			// text 2 background
+			bX: orgX,
+			bY: orgY + 130,
+			width: orgWidth,
+			height: 30,
+			backColor: '#fff',
+			direction: -1
+		}, {
+			//text3 small background
+			bX: orgX,
+			bY: orgY + 130,
+			width: orgWidth,
+			height: 30,
+			backColor: '#d63f05',
+		}]
+	}
+
+	function createRect(opt) {
+		var p = {};
+		p.offsetX = 0;
+		p.draw = function() {
+			//clip range
+			ctx.save();
+			ctx.beginPath();
+			ctx.rect(orgX, orgY, orgWidth, orgHeight);
+			ctx.clip();
+
+			ctx.beginPath();
+			ctx.fillStyle = opt.backColor;
+
+			width = p.offsetX * 1;
+			if (width > orgWidth / 2) {
+				width = orgWidth - p.offsetX * 1;
+			}
+			width = width / 1.5;
+			ctx.fillRect(opt.bX + orgWidth - p.offsetX * 1, opt.bY, width, opt.height);
+
+			ctx.restore();
+		}
+		return p;
+	}
+
+	function createBackText(opt) {
+		var p = {};
+		p.offsetX = 0;
+		p.draw = function() {
+			//clip range
+			ctx.save();
+			ctx.beginPath();
+			if (opt.direction > 0) {
+				ctx.rect(orgX, orgY, p.offsetX * 1, orgHeight);
+			} else {
+				ctx.rect(orgX + orgWidth - p.offsetX * 1, orgY, p.offsetX * 1, orgHeight);
+			}
+			ctx.clip();
+			
+			// draw background
+			ctx.beginPath();
+			ctx.fillStyle = opt.backColor;
+			ctx.fillRect(opt.bX, opt.bY, opt.width, opt.height);
+
+			// draw text
+			ctx.font = opt.font;
+			ctx.fillStyle = opt.color;
+			ctx.textAlign = opt.align;
+			ctx.fillText(opt.text, opt.x, opt.y);
+
+			ctx.restore();
+		}
+		return p;
+	}
+
+	function createText(opt) {
+		var p = {};
+		p.offsetX = 0;
+		p.draw = function() {
+			//clip range
+			ctx.save();
+			ctx.beginPath();
+			ctx.rect(orgX, orgY, orgWidth, orgHeight);
+			ctx.clip();
+			
+			// draw text
+			ctx.font = opt.font;
+			ctx.fillStyle = opt.color;
+			ctx.textAlign = opt.align;
+			ctx.fillText(opt.text, opt.x + orgWidth - p.offsetX * 1, opt.y);
+
+			ctx.restore();
+		}
+		return p;
+	}
+
+	var text = createText(settings.text[0]);
+	var text11 = createBackText(settings.text[1]);
+	var text12 = createBackText(settings.text[2]);
+	var text21 = createBackText(settings.text[3]);
+	var text22 = createRect(settings.text[4]);
+
+	var clearCanvas = function(){
+		ctx.clearRect(0, 0, canvasEl.width, canvasEl.height);
+	};
+
+	function drawTargets(anim) {
+		clearCanvas();
+		for (var i = 0; i < anim.animatables.length; i++) {
+			anim.animatables[i].target.draw();
+		}
+	}
+
+	var duration = [1000, 2000, 2000, 2000, 3000]
+	var delay = [0, 1000, 1000, 1000, 1000];
+	var easing = [
+		'easeInOutCubic',
+		'easeOutCubic',
+		'easeOutCubic',
+		'easeOutCubic',
+		'easeOutCubic',
+	]
+
+	timeline.add({
+		targets: [text11, text12, text21, text22, text],
+		color: '#fff',
+		offsetX: orgWidth,
+		easing: function(el, i) { return easing[i]; },//'easeInOutCubic',
+		delay: function(el, i) { return delay[i]; },
+		duration: function(el, i) { return duration[i]; },
+		update: drawTargets
+	}).complete = clearCanvas;
+
+	document.getElementById("playpause").onclick = function() {
+		if( timeline.paused ){
+			timeline.play();
+		} else {
+			timeline.pause();
+		}
+	};
+
+	document.getElementById("play").onclick = function() {
+		timeline.play();
+	};
+
+	document.getElementById("pause").onclick = function() {
+		timeline.pause();
+	};
+
+	document.getElementById("stop").onclick = function() {
+		clearTimeout();
+		timeline.restart();
+		timeline.pause();
+		clearCanvas();
+	};
+
+	document.getElementById("restart").onclick = function() {
+		timeline.restart();
+	};
+
+    //To display buttons add #buttons hash to page address and reload
+    if( window.location.hash.indexOf('buttons') > -1 ){
+        document.getElementById('vba-buttons').style.display = 'block';
+    }
+</script>
+</html>
